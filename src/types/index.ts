@@ -31,6 +31,8 @@ export interface Review {
     nombre: string
     texto: string
     estrellas: string
+    foto1?: string
+    foto2?: string
 }
 
 export interface Info {
