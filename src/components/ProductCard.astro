@@ -7,7 +7,6 @@ interface Props {
 }
 
 const { product, config } = Astro.props;
-
 const hasOffer = !!product.precio_oferta;
 const isNew = product.novedad?.toLowerCase() === "si";
 const badge = hasOffer ? "OFERTA" : isNew ? "NUEVO" : null;
@@ -24,9 +23,9 @@ const badge = hasOffer ? "OFERTA" : isNew ? "NUEVO" : null;
         style="aspect-ratio: 3/4; background: var(--bg-card);"
     >
         {
-            product.imagen ? (
+            product.imagen1 ? (
                 <img
-                    src={product.imagen}
+                    src={product.imagen1}
                     alt={product.nombre}
                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
@@ -36,7 +35,6 @@ const badge = hasOffer ? "OFERTA" : isNew ? "NUEVO" : null;
                 </div>
             )
         }
-
         <!-- Badge -->
         {
             badge && (

@@ -2,11 +2,16 @@ export interface Product {
     id: string
     nombre: string
     descripcion: string
-    imagen: string
+    imagen1: string
+    imagen2?: string
+    imagen3?: string
+    imagen4?: string
     precio: string
+    precio_oferta?: string
     disponible: string
     categoria: string
-    [key: string]: string
+    novedad?: string
+    [key: string]: string | undefined
 }
 
 export interface Config {

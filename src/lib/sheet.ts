@@ -102,7 +102,7 @@ export function getCategories(products: Product[]): string[] {
 }
 
 export function getCustomFields(products: Product[]): string[] {
-    const fixed = ['id', 'nombre', 'descripcion', 'imagen', 'precio', 'disponible', 'categoria']
+    const fixed = ['id', 'nombre', 'descripcion', 'imagen1', 'imagen2', 'imagen3', 'imagen4', 'precio', 'precio_oferta', 'disponible', 'categoria', 'novedad']
     if (products.length === 0) return []
     return Object.keys(products[0]).filter(k => !fixed.includes(k) && products[0][k])
 }
