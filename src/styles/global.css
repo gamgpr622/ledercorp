@@ -52,3 +52,15 @@ img {
     max-width: 100%;
     display: block;
 }
+
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    /* IE y Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari y Opera */
+}

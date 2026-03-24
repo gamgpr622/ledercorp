@@ -31,10 +31,7 @@ const reservas = await getReservas();
 const novedades = products
 	.filter((p) => p.novedad?.toLowerCase() === "si")
 	.slice(0, 6);
-const catalogo = products
-	.filter((p) => p.disponible?.toLowerCase() !== "no")
-	.sort(() => Math.random() - 0.5)
-	.slice(0, 10);
+const catalogo = products.sort(() => Math.random() - 0.5).slice(0, 10);
 ---
 
 <Layout

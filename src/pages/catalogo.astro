@@ -12,9 +12,7 @@ import { getProducts, getConfig, getCategories } from "../lib/sheet";
 const config = await getConfig();
 const products = await getProducts();
 const categories = getCategories(products);
-const disponibles = products.filter(
-    (p) => p.disponible?.toLowerCase() !== "no",
-);
+const disponibles = products;
 ---
 
 <Layout
@@ -46,7 +44,7 @@ const disponibles = products.filter(
         >
             <!-- Categorías con scroll horizontal -->
             <div
-                class="flex gap-2 overflow-x-auto pb-1 md:pb-0"
+                class="flex flex-wrap gap-x-2 gap-y-3 pb-1 md:pb-0"
                 style="scrollbar-width: none;"
             >
                 {
@@ -60,6 +58,14 @@ const disponibles = products.filter(
                         </button>
                     ))
                 }
+
+                <button
+                    class="cat-btn shrink-0 text-sm font-bold px-5 py-2.5 rounded-full border transition-all duration-200"
+                    data-cat="Agotados"
+                    style="border-color: var(--border); background: transparent; color: var(--text-muted); cursor: pointer;"
+                >
+                    AGOTADOS
+                </button>
             </div>
 
             <!-- Búsqueda -->
@@ -138,7 +144,6 @@ const disponibles = products.filter(
         let searchTerm = "";
         let visibleCount = PAGE_SIZE;
 
-        // Ocultar todos los cards al inicio
         allCards.forEach((card) => (card.style.display = "none"));
 
         function getFiltered() {
@@ -147,12 +152,26 @@ const disponibles = products.filter(
                 const data = JSON.parse(
                     card.getAttribute("data-product") || "{}",
                 );
-                const matchCat = activeCat === "Todos" || cat === activeCat;
+
+                const isProductAgotado =
+                    data.disponible?.toLowerCase() === "no";
+
+                let matchCat = false;
+
+                if (activeCat === "Todos") {
+                    matchCat = true;
+                } else if (activeCat === "Agotados") {
+                    matchCat = isProductAgotado;
+                } else {
+                    matchCat = cat === activeCat;
+                }
+
                 const matchSearch =
                     searchTerm === "" ||
                     data.nombre?.toLowerCase().includes(searchTerm) ||
                     data.descripcion?.toLowerCase().includes(searchTerm) ||
                     cat.toLowerCase().includes(searchTerm);
+
                 return matchCat && matchSearch;
             });
         }
@@ -160,10 +179,8 @@ const disponibles = products.filter(
         function render() {
             const filtered = getFiltered();
 
-            // Ocultar todos
             allCards.forEach((card) => (card.style.display = "none"));
 
-            // Mostrar solo los visibles
             filtered
                 .slice(0, visibleCount)
                 .forEach((card) => (card.style.display = "block"));
@@ -175,11 +192,9 @@ const disponibles = products.filter(
             emptyEl.classList.toggle("hidden", total > 0);
             gridEl.classList.toggle("hidden", total === 0);
 
-            // Mostrar/ocultar sentinel
             sentinel.style.display = visibleCount < total ? "block" : "none";
         }
 
-        // Scroll infinito con IntersectionObserver
         const observer = new IntersectionObserver(
             (entries) => {
                 if (entries[0].isIntersecting) {
@@ -232,8 +247,6 @@ const disponibles = products.filter(
                 window.__openModal(data, moneda, PRIMARY, whatsapp);
             });
         });
-
-        // Render inicial
         render();
     </script>
 </Layout>

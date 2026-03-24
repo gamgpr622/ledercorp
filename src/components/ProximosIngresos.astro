@@ -1,5 +1,6 @@
 ---
 import type { Reserva } from '../lib/sheet'
+import { IconArrowLeft, IconArrowRight } from "../lib/icons";
 
 interface Props {
   reservas: Reserva[]
@@ -52,14 +53,31 @@ const { reservas, whatsapp } = Astro.props
         <!-- Imagen derecha -->
         <div class="flex flex-col gap-4">
           <!-- Imagen principal -->
-          <div class="rounded-2xl overflow-hidden" style="aspect-ratio: 4/3; background: #1a1a1a;">
-            <img
-              id="reserva-imagen"
-              src=""
-              alt=""
-              class="w-full h-full object-cover transition-opacity duration-500"
-            />
-          </div>
+          <div class="relative group rounded-2xl overflow-hidden" style="aspect-ratio: 4/3; background: #1a1a1a;">
+  <img
+    id="reserva-imagen"
+    src=""
+    alt=""
+    class="w-full h-full object-cover transition-opacity duration-500"
+  />
+
+  {reservas.length > 1 && (
+    <>
+      <button 
+        id="reserva-prev" 
+        class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center bg-black/50 text-white border border-white/20 transition-all hover:bg-white hover:text-black z-10 cursor-pointer"
+      >
+        <Fragment set:html={IconArrowLeft} />
+      </button>
+      <button 
+        id="reserva-next" 
+        class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center bg-black/50 text-white border border-white/20 transition-all hover:bg-white hover:text-black z-10 cursor-pointer"
+      >
+        <Fragment set:html={IconArrowRight} />
+      </button>
+    </>
+  )}
+</div>
 
           <!-- Miniaturas -->
           {reservas.length > 1 && (
@@ -96,11 +114,18 @@ const { reservas, whatsapp } = Astro.props
   const btnText = document.getElementById('reserva-btn-text')
   const imagenEl = document.getElementById('reserva-imagen')
   const thumbs = document.querySelectorAll('.reserva-thumb')
+  const prevBtn = document.getElementById('reserva-prev')
+  const nextBtn = document.getElementById('reserva-next')
+
+  let currentIndex = 0;
 
   function goTo(index) {
-    const r = reservas[index]
+    if (index < 0) index = reservas.length - 1;
+    if (index >= reservas.length) index = 0;
+    
+    currentIndex = index;
+    const r = reservas[currentIndex];
 
-    // Fade out
     if (imagenEl) imagenEl.style.opacity = '0'
 
     setTimeout(() => {
@@ -108,7 +133,6 @@ const { reservas, whatsapp } = Astro.props
       if (categoriaEl) categoriaEl.textContent = r.categoria || ''
       if (descripcionEl) descripcionEl.textContent = r.descripcion || ''
 
-      // Precio
       if (precioEl) {
         if (r.precio) {
           precioEl.textContent = `S/. ${Number(r.precio).toLocaleString()}`
@@ -119,7 +143,6 @@ const { reservas, whatsapp } = Astro.props
         }
       }
 
-      // Fecha estimada
       if (fechaWrap && fechaEl) {
         if (r.fecha_estimada) {
           fechaWrap.classList.remove('hidden')
@@ -129,33 +152,36 @@ const { reservas, whatsapp } = Astro.props
         }
       }
 
-      // Botón WhatsApp
       const msg = r.precio
         ? `Hola! Quiero reservar: ${r.nombre}`
         : `Hola! Me interesa consultar y reservar: ${r.nombre}. ¿Cuál es el precio?`
       if (btnEl) btnEl.href = `https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`
       if (btnText) btnText.textContent = r.precio ? 'Reservar por WhatsApp' : 'Consultar y Reservar'
 
-      // Imagen
       if (imagenEl) {
         imagenEl.src = r.imagen || ''
         imagenEl.alt = r.nombre
         imagenEl.style.opacity = '1'
       }
 
-      // Miniaturas
       thumbs.forEach((thumb, i) => {
-        thumb.style.opacity = i === index ? '1' : '0.4'
-        thumb.style.borderColor = i === index ? 'white' : 'transparent'
+        thumb.style.opacity = i === currentIndex ? '1' : '0.4'
+        thumb.style.borderColor = i === currentIndex ? 'white' : 'transparent'
       })
+
+      const activeThumb = thumbs[currentIndex];
+      if (activeThumb) {
+        activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
     }, 250)
   }
 
-  // Miniaturas click
+  prevBtn?.addEventListener('click', () => goTo(currentIndex - 1))
+  nextBtn?.addEventListener('click', () => goTo(currentIndex + 1))
+
   thumbs.forEach((thumb, i) => {
     thumb.addEventListener('click', () => goTo(i))
   })
 
-  // Inicializar con el primero
   if (reservas.length > 0) goTo(0)
 </script>
